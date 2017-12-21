@@ -1,2 +1,5 @@
 rootProject.name = 'GradleInAction'
 
+include "shared", "api", "services:webservice", "services:shared"
+include 'test'
+

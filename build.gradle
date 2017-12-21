@@ -1,19 +1,52 @@
-group 'com.lorelib'
-version '1.0'
+allprojects {
+    group 'com.lorelib'
+    version '1.0'
 
-apply plugin: 'java'
-
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
+    apply plugin: 'java'
+    apply plugin: 'maven'
+    apply plugin: 'eclipse'
+    apply plugin: 'eclipse-wtp'
+    apply plugin: 'groovy'
 }
 
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'GradleInAction', 'Implementation-Version': version, 'Provider': 'gradle'
+    }
 }
 
-//gradle -q hello执行
+subprojects {
+    sourceCompatibility = 1.8
+
+    test {
+        systemProperties 'p1': "test"
+    }
+
+    repositories {
+        maven {
+            url ""
+        }
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+    }
+}
+
+uploadArchives {
+    repositories {
+        flatDir {
+            dirs 'repos'
+        }
+        mavenDeployer {
+            repository(url: "")
+        }
+    }
+}
+
+// gradle -q hello执行
 task hello {
     doLast  {
         println 'Hello world!'
