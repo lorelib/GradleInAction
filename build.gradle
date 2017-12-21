@@ -1,0 +1,89 @@
+group 'com.lorelib'
+version '1.0'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+//gradle -q hello执行
+task hello {
+    doLast  {
+        println 'Hello world!'
+    }
+}
+
+task upper(dependsOn: hello) << {
+    String name = 'listening'
+    println "name: " + name
+    println "upper name: " + name.toUpperCase()
+}
+
+// dependsOn中用''包含的依赖任务为Lazy dependsOn任务，即依赖的任务还没有被创建
+task hello2(dependsOn: 'lazyT') << {
+    println 'Hello world2!'
+}
+
+task lazyT << {
+    println 'behind load'
+}
+
+// gradle -q task1 、 gradle -q task2等，从0开始
+4.times { count ->
+    task "task$count" << {
+        println "task number $count"
+    }
+}
+
+task0.dependsOn task2, task3
+
+hello.doFirst {
+    println 'Hello first'
+}
+
+// $引用任务必须在""双引号里面
+hello.doLast {
+    println "task name: $hello.name"
+}
+
+task myTask {
+    ext.myProperty = 'my task'
+}
+
+task printTaskProperties << {
+    println myTask.myProperty
+}
+
+defaultTasks 'cleanT', 'runT'
+
+task cleanT << {
+    println 'default clean'
+}
+
+task runT << {
+    println 'default run'
+}
+
+task distribution << {
+    println "We build the zip with version=$version"
+}
+
+task release(dependsOn: 'distribution') << {
+    println 'we release now'
+}
+
+gradle.taskGraph.whenReady {taskGraph ->
+    if (taskGraph.hasTask(release)) {
+        version = '1.0'
+    } else {
+        version = '1.0-SNAPSHOT'
+    }
+}
+
