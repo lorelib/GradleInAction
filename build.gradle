@@ -7,7 +7,18 @@ allprojects {
     apply plugin: 'eclipse'
     apply plugin: 'eclipse-wtp'
     apply plugin: 'groovy'
+    apply plugin: 'war'
+    apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
 }
+
+description "Gradle in action project"
+
+// 使用gradle -q check输出
+println name
+println project.name
+
+def book = "童年"
+println book
 
 jar {
     manifest {
@@ -31,8 +42,29 @@ subprojects {
     }
 
     dependencies {
+        compile 'org.codehaus.groovy:groovy-all:2.4.13'
         testCompile group: 'junit', name: 'junit', version: '4.12'
     }
+}
+
+ext {
+    springVersion = "4.3.13.RELEASE"
+}
+
+sourceSets.all { ext.purpose = null }
+
+sourceSets {
+    main {
+        purpose = "production"
+    }
+    test {
+        purpose = "test"
+    }
+}
+
+task printProperties << {
+    println springVersion
+    sourceSets.matching { it.purpose == "production" }.each { println it.name }
 }
 
 uploadArchives {
@@ -45,6 +77,14 @@ uploadArchives {
         }
     }
 }
+
+def dest = "dest"
+task copy(type: Copy) {
+    from "source"
+    into dest
+}
+
+println project.copy.name
 
 // gradle -q hello执行
 task hello {
@@ -60,7 +100,7 @@ task upper(dependsOn: hello) << {
 }
 
 // dependsOn中用''包含的依赖任务为Lazy dependsOn任务，即依赖的任务还没有被创建
-task hello2(dependsOn: 'lazyT') << {
+task hello2(dependsOn: ['lazyT', hello]) << {
     println 'Hello world2!'
 }
 

@@ -1,3 +1,16 @@
 dependencies {
     compile project(':shared')
 }
+
+println name
+println project.name
+println springVersion
+
+task apiHello << {
+    println 'api hello'
+}
+
+// gradle :api:war
+war {
+    archiveName 'api.war'
+}
